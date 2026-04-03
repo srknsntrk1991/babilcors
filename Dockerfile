@@ -17,19 +17,6 @@ USER app
 EXPOSE 2101
 EXPOSE 8001
 
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD python - <<'PY' || exit 1
-import socket,sys
-host='127.0.0.1'
-port=2101
-s=socket.socket()
-s.settimeout(2)
-try:
-    s.connect((host,port))
-    s.sendall(b"GET /healthz HTTP/1.0\r\n\r\n")
-    buf=s.recv(64)
-    sys.exit(0 if b"200" in buf else 1)
-except Exception:
-    sys.exit(1)
-PY
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD python -c "import socket,sys;host='127.0.0.1';port=2101;s=socket.socket();s.settimeout(2);try:s.connect((host,port));s.sendall(b'GET /healthz HTTP/1.0\r\n\r\n');buf=s.recv(64);sys.exit(0 if b'200' in buf else 1);except Exception:sys.exit(1)"
 
 CMD ["python", "main.py", "--config", "config/caster_config.json"]
