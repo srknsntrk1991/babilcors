@@ -1,0 +1,12 @@
+syntax = "proto3";
+package gnss.v1;
+
+message RtcmEnvelope {
+  bytes rtcm = 1;
+  uint32 msg_type = 2;
+  uint32 station_id = 3;
+  int64 ts_unix_ms = 4;
+  uint32 crc_errors = 5;
+  string mountpoint = 6;
+}
+

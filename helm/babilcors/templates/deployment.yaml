@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "babilcors.fullname" . }}
+  labels:
+    {{- include "babilcors.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "babilcors.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "babilcors.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: caster
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        env:
+        {{- range $k, $v := .Values.env }}
+        - name: {{ $k }}
+          value: "{{ $v }}"
+        {{- end }}
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "babilcors.fullname" . }}-config

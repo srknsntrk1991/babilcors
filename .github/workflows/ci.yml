@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install protoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Validate protobuf schema (generate and diff)
+        run: |
+          mkdir -p /tmp/pbgen
+          protoc -I proto --python_out=/tmp/pbgen proto/rtcm_envelope.proto || true
+          test -f /tmp/pbgen/gnss/v1/rtcm_envelope_pb2.py || (echo 'protoc output missing' && exit 1)
+          head -n 20 /tmp/pbgen/gnss/v1/rtcm_envelope_pb2.py
+          python - <<'PY'
+          import pathlib
+          p = pathlib.Path('proto/rtcm_envelope.proto')
+          txt = p.read_text(encoding='utf-8')
+          assert 'message RtcmEnvelope' in txt
+          for f in ('rtcm', 'msg_type', 'station_id', 'ts_unix_ms', 'crc_errors', 'mountpoint'):
+            assert f in txt
+          PY
+      - name: Run unit tests
+        run: |
+          python -m unittest discover -s tests -p "test_*.py" -v
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          docker build -t babilcors-caster:ci .
+
+  trivy:
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          docker build -t babilcors-caster:ci .
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@0.22.0
+        with:
+          image-ref: babilcors-caster:ci
+          format: table
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          exit-code: "1"

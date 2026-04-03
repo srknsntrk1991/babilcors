@@ -1,0 +1,33 @@
+image:
+  repository: ghcr.io/OWNER/babilcors-caster
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 2101
+
+replicaCount: 1
+
+resources: {}
+
+config:
+  caster_config_json: |
+    {
+      "listen": {"host": "0.0.0.0", "port": 2101},
+      "logging": {"level": "INFO", "format": "json"},
+      "sourcetable": {"operator": "BABILCORS", "country": "TR"},
+      "sources": {"password": "env:SOURCES_PASSWORD", "mountpoints": ["KNY1"]},
+      "tiers": {"free": {"rate_limit_bps": 0, "max_epochs_per_minute": 0, "max_queue_bytes": 262144}},
+      "users": {"demo": {"password": "env:DEMO_PASS", "tier": "free", "mountpoints": ["*"]}},
+      "security": {
+        "admin_token": "env:ADMIN_TOKEN",
+        "admin_rate_limit_per_min": 60,
+        "audit_file": "logs/audit.log"
+      }
+    }
+
+env:
+  SOURCES_PASSWORD: ""
+  DEMO_PASS: ""
+  ADMIN_TOKEN: ""

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "babilcors.fullname" . }}
+  labels:
+    {{- include "babilcors.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: ntrip
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+  selector:
+    app.kubernetes.io/name: {{ include "babilcors.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

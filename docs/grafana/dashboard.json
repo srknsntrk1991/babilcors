@@ -1,0 +1,41 @@
+{
+  "annotations": {"list": []},
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Rovers Total",
+      "gridPos": {"x": 0, "y": 0, "w": 8, "h": 4},
+      "targets": [{"expr": "caster_rovers_total"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Source Up",
+      "gridPos": {"x": 8, "y": 0, "w": 16, "h": 8},
+      "targets": [{"expr": "caster_mountpoint_source_up{mountpoint=\"$mountpoint\"}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "RTCM Frames Rate",
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "targets": [{"expr": "rate(caster_mountpoint_rtcm_frames_total{mountpoint=\"$mountpoint\"}[5m])"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Dropped Bytes Rate",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "targets": [{"expr": "rate(caster_mountpoint_dropped_bytes_total{mountpoint=\"$mountpoint\"}[5m])"}]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "mountpoint",
+        "type": "query",
+        "query": "label_values(caster_mountpoint_rovers, mountpoint)",
+        "refresh": 1
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "BabilCORS Caster"
+}

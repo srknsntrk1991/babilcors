@@ -1,0 +1,66 @@
+{
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 2101
+  },
+  "logging": {
+    "level": "INFO"
+  },
+  "sourcetable": {
+    "operator": "BABILCORS",
+    "country": "TR"
+  },
+  "sources": {
+    "password": "env:SOURCE_PASSWORD",
+    "mountpoints": ["KNY1", "BBL"]
+  },
+  "tiers": {
+    "free": {
+      "rate_limit_bps": 20000,
+      "max_epochs_per_minute": 600,
+      "max_queue_bytes": 262144
+    },
+    "pro": {
+      "rate_limit_bps": 0,
+      "max_epochs_per_minute": 0,
+      "max_queue_bytes": 1048576
+    }
+  },
+  "users": {
+    "admin": {
+      "password": "env:ADMIN_PASSWORD",
+      "tier": "pro",
+      "mountpoints": ["*"],
+      "role": "admin"
+    },
+    "demo": {
+      "password": "demo",
+      "tier": "free",
+      "mountpoints": ["KNY1"]
+    }
+  },
+  "security": {
+    "admin_token": "env:ADMIN_TOKEN",
+    "admin_jwt_secret": "env:ADMIN_JWT_SECRET",
+    "admin_jwt_exp_s": 3600,
+    "admin_jwt_refresh_exp_s": 604800,
+    "api_ws_port": 8001,
+    "shadow_redis_url": "env:SHADOW_REDIS_URL",
+    "iot_mqtt_host": "env:IOT_MQTT_HOST",
+    "iot_mqtt_port": 1883,
+    "iot_mqtt_username": "env:IOT_MQTT_USERNAME",
+    "iot_mqtt_password": "env:IOT_MQTT_PASSWORD",
+    "iot_mqtt_tls": false,
+    "diagnostics": {
+      "snr_low": 25,
+      "nmea_stale_s": 10,
+      "rtcm_stale_s": 5,
+      "jamming_snr": 20,
+      "jamming_nsat": 8,
+      "jamming_hdop": 2.5,
+      "spoofing_jump_dist_m": 500,
+      "spoofing_jump_speed_mps": 80
+    }
+  }
+}
+

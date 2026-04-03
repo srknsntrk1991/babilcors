@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>BabilCORS WS Viewer</title></head>
+<body>
+<h1>WS Stream</h1>
+<input id="mp" placeholder="mountpoint" value="KNY1"/> <input id="port" placeholder="port" value="8001"/> <button id="btn">Connect</button>
+<pre id="log"></pre>
+<script src="https://unpkg.com/protobufjs/dist/protobuf.min.js"></script>
+<script>
+const log = (m) => { document.getElementById('log').textContent += m + "\n" }
+document.getElementById('btn').onclick = () => {
+  const mp = document.getElementById('mp').value || 'KNY1'
+  const port = document.getElementById('port').value || '8001'
+  const ws = new WebSocket(`ws://${location.hostname}:${port}/api/v1/ws/${mp}`)
+  let c = 0
+  ws.binaryType = 'arraybuffer'
+  const proto = `syntax = "proto3"; package gnss.v1; message RtcmEnvelope { bytes rtcm=1; uint32 msg_type=2; uint32 station_id=3; int64 ts_unix_ms=4; uint32 crc_errors=5; string mountpoint=6; }`;
+  const root = protobuf.parse(proto).root;
+  const Msg = root.lookupType('gnss.v1.RtcmEnvelope');
+  ws.onopen = () => log('connected')
+  ws.onmessage = ev => {
+    c++;
+    const bytes = new Uint8Array(ev.data);
+    const m = Msg.decode(bytes);
+    if (c % 25 === 0) log(`frames=${c} type=${m.msg_type} stid=${m.station_id} rtcm_bytes=${m.rtcm.length}`);
+  }
+  ws.onerror = e => log('error')
+  ws.onclose = () => log('closed')
+}
+</script>
+</body>
+</html>

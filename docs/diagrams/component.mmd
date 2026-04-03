@@ -1,0 +1,26 @@
+flowchart LR
+  subgraph Clients
+    S((Source))
+    R1((Rover))
+    R2((Rover))
+  end
+  subgraph Caster
+    C[NtripCaster]
+    H[MountpointHub]
+    A[Auth]
+    T[Tiers]
+    Q[ByteQueue]
+    M[Metrics]
+    L[Logs/Audit]
+  end
+  S -->|RTCM3| C
+  R1 -->|GET /MP| C
+  R2 -->|GET /MP| C
+  C --> H
+  C --> A
+  C --> T
+  H --> Q
+  C --> M
+  C --> L
+  C -->|RTCM3| R1
+  C -->|RTCM3| R2

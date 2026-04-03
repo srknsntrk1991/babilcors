@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: babilcors-caster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: babilcors-caster
+  template:
+    metadata:
+      labels:
+        app: babilcors-caster
+    spec:
+      containers:
+      - name: caster
+        image: async-ntrip-caster:latest
+        ports:
+        - containerPort: 2101
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 2101
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 2101
+          initialDelaySeconds: 10
+          periodSeconds: 20
+      volumes:
+      - name: config
+        configMap:
+          name: babilcors-caster-config
+

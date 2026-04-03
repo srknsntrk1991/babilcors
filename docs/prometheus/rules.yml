@@ -1,0 +1,47 @@
+groups:
+- name: caster-slo-alerts
+  rules:
+  - alert: SourceDown
+    expr: caster_mountpoint_source_up == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Mountpoint {{ $labels.mountpoint }} source down"
+      description: "Source is down for more than 2 minutes"
+
+  - alert: DroppedBytesHigh
+    expr: rate(caster_mountpoint_dropped_bytes_total[5m]) > 1000
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High dropped bytes on {{ $labels.mountpoint }}"
+      description: "Sustained dropped bytes > 1000 B/s"
+
+  - alert: AuthUnauthorizedSpike
+    expr: rate(caster_auth_unauthorized_total[5m]) > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Unauthorized spike"
+      description: "Unauthorized requests exceed 10/min (overall or per-mountpoint)"
+
+  - alert: SourceFreshnessStale
+    expr: caster_mountpoint_last_rtcmtime_age_seconds > 5
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Source freshness stale"
+      description: "Last RTCM frame age exceeds 5s"
+
+  - alert: RoverNmeaStale
+    expr: max by (mountpoint,conn_id) (caster_rover_last_nmea_age_seconds) > 10
+    for: 2m
+    labels:
+      severity: info
+    annotations:
+      summary: "Rover NMEA stale"
+      description: "Rover last NMEA age exceeds 10s"

@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant S as Source
+  participant C as Caster
+  participant H as MountpointHub
+  participant R as Rover
+  S->>C: SOURCE <pwd> /MP
+  C->>H: attach_source(MP)
+  C-->>S: ICY 200 OK
+  R->>C: GET /MP + Authorization
+  C->>H: add_rover(session)
+  C-->>R: ICY 200 OK
+  loop RTCM stream
+    S->>C: RTCM bytes
+    C->>C: validate RTCM 3.2 frames
+    C->>H: on_source_data(frames)
+    H-->>R: enqueue/send
+  end

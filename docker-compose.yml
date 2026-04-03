@@ -1,0 +1,31 @@
+services:
+  babilcors:
+    build: .
+    image: babilcors-caster:local
+    ports:
+      - "2101:2101"
+      - "8001:8001"
+    environment:
+      SOURCE_PASSWORD: "sourcepass"
+      ADMIN_PASSWORD: "adminpass"
+      ADMIN_TOKEN: "change-me"
+      ADMIN_JWT_SECRET: "change-me-to-32bytes-min"
+      SHADOW_REDIS_URL: "redis://redis:6379/0"
+      IOT_MQTT_HOST: "mosquitto"
+      IOT_MQTT_USERNAME: ""
+      IOT_MQTT_PASSWORD: ""
+    command: ["python", "main.py", "--config", "config/caster_config.docker.json"]
+    depends_on:
+      - redis
+      - mosquitto
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+

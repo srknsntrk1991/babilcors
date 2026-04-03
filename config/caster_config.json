@@ -1,0 +1,42 @@
+{
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 2101
+  },
+  "logging": {
+    "level": "INFO"
+  },
+  "sourcetable": {
+    "operator": "BABILCORS",
+    "country": "TR"
+  },
+  "sources": {
+    "password": "sourcepass",
+    "mountpoints": ["KNY1", "KNYA", "BBL"]
+  },
+  "tiers": {
+    "free": {
+      "rate_limit_bps": 20000,
+      "max_epochs_per_minute": 600,
+      "max_queue_bytes": 262144
+    },
+    "pro": {
+      "rate_limit_bps": 0,
+      "max_epochs_per_minute": 0,
+      "max_queue_bytes": 1048576
+    }
+  },
+  "users": {
+    "babil": {
+      "password": "cors",
+      "tier": "pro",
+      "mountpoints": ["*"]
+    },
+    "demo": {
+      "password": "demo",
+      "tier": "free",
+      "mountpoints": ["KNY1", "BBL"]
+    }
+  }
+}
+

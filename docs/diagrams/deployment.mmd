@@ -1,0 +1,6 @@
+flowchart TB
+  Internet((Internet)) --> LB[Load Balancer / Ingress]
+  LB --> Pod[Caster Pod]
+  Pod -->|/metrics| Prom[Prometheus]
+  Prom --> Graf[Grafana]
+  Pod --> Loki[Loki/HTTP Audit Sink]
