@@ -36,8 +36,8 @@ class ProtobufSerializer:
         pool = descriptor_pool.DescriptorPool()
         file_desc = pool.Add(fdp)
         factory = message_factory.MessageFactory(pool)
-        # Use GetMessageClass for protobuf >= 4.x compatibility
-        self._cls = factory.GetMessageClass(file_desc.message_types_by_name["RtcmEnvelope"])  # type: ignore
+        # Use GetPrototype for compatibility with protobuf 4.25.3
+        self._cls = factory.GetPrototype(file_desc.message_types_by_name["RtcmEnvelope"])  # type: ignore
 
     def serialize(self, *, rtcm: bytes, msg_type: int, station_id: int, mountpoint: str, crc_errors: int) -> bytes:
         ts_ms = int(time.time() * 1000)

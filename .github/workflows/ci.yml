@@ -55,7 +55,7 @@ jobs:
         run: |
           docker build -t babilcors-caster:ci .
       - name: Trivy scan
-        uses: aquasecurity/trivy-action@0.26.0
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: babilcors-caster:ci
           format: table
